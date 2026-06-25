@@ -1,0 +1,8 @@
+{
+  "name": "SmartCrowd Connect",
+  "description": "A smart, location-aware crowd-tracking service finder that prioritizes low-congestion hospitals, banks, and shops over distance alone.",
+  "requestFramePermissions": [
+    "geolocation"
+  ],
+  "majorCapabilities": ["MAJOR_CAPABILITY_SERVER_SIDE_GEMINI_API"]
+}
