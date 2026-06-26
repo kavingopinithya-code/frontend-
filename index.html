@@ -10,3 +10,93 @@
     <script type="module" src="/src/main.tsx"></script>
   </body>
 </html>
+<script src="https://maps.googleapis.com/maps/api/js?key=YOUR_API_KEY&libraries=places"></script>
+import { GoogleMap, LoadScript, Marker } from "@react-google-maps/api";
+import { useState } from "react";
+
+const containerStyle = {
+  width: "100%",
+  height: "400px",
+};
+
+function App() {
+  const [position, setPosition] = useState({
+    lat: 13.0827, // default Chennai
+    lng: 80.2707,
+  });
+
+  const handleSearch = async () => {
+    const address = (document.getElementById("address") as HTMLInputElement).value;
+
+    const res = await fetch(
+      `https://maps.googleapis.com/maps/api/geocode/json?address=${address}&key=YOUR_API_KEY`
+    );
+
+    const data = await res.json();
+
+    if (data.results.length > 0) {
+      const loc = data.results[0].geometry.location;
+      setPosition({ lat: loc.lat, lng: loc.lng });
+    }
+  };
+
+  return (
+    <div>
+      <h2>Smart Crowd Map</h2>
+
+      <input id="address" placeholder="Enter location" />
+      <button onClick={handleSearch}>Search</button>
+
+      <LoadScript googleMapsApiKey="YOUR_API_KEY">
+        <GoogleMap mapContainerStyle={containerStyle} center={position} zoom={14}>
+          <Marker position={position} />
+        </GoogleMap>
+      </LoadScript>
+    </div>
+  );
+}
+
+export default App;
+import { MapContainer, TileLayer, Marker, Popup } from "react-leaflet";
+import "leaflet/dist/leaflet.css";
+import { useState } from "react";
+
+function App() {
+  const [position, setPosition] = useState<[number, number]>([13.0827, 80.2707]); // Chennai default
+
+  const handleSearch = async () => {
+    const address = (document.getElementById("address") as HTMLInputElement).value;
+
+    const res = await fetch(
+      `https://nominatim.openstreetmap.org/search?format=json&q=${address}`
+    );
+
+    const data = await res.json();
+
+    if (data.length > 0) {
+      const lat = parseFloat(data[0].lat);
+      const lon = parseFloat(data[0].lon);
+      setPosition([lat, lon]);
+    }
+  };
+
+  return (
+    <div>
+      <h2>Smart Crowd Map</h2>
+
+      <input id="address" placeholder="Enter location" />
+      <button onClick={handleSearch}>Search</button>
+
+      <MapContainer center={position} zoom={13} style={{ height: "400px", width: "100%" }}>
+        <TileLayer
+          url="https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png"
+        />
+        <Marker position={position}>
+          <Popup>Selected Location</Popup>
+        </Marker>
+      </MapContainer>
+    </div>
+  );
+}
+
+export default App;
